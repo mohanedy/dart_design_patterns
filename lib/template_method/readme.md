@@ -326,6 +326,10 @@ Do you want to add Condiments? No
 
 ## When to use
 
+- When you want to avoid duplication in the code, the general workflow structure is implemented once in the abstract class’s algorithm, and necessary variations are implemented in the subclasses.
+  
+- when you want to control at what points subclassing is allowed. As opposed to a simple polymorphic override, where the base method would be entirely rewritten allowing radical change to the workflow, only the specific details of the workflow are allowed to change.
+
 ## Credits
 
 The example used in this article is from Head First Design Patterns 2nd edition.
