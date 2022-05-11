@@ -1,10 +1,14 @@
+import 'package:meta/meta.dart';
+
 abstract class CaffeineBevrage {
   const CaffeineBevrage();
+
+  @nonVirtual
   void prepareRecipe() {
     boilWater();
     brew();
-    addCondiments();
     pourInCup();
+    addCondiments();
   }
 
   void brew();

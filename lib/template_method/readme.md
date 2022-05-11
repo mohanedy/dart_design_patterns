@@ -1,22 +1,21 @@
 # Template Method Design Pattern (Encapsulating Algorithms)
 
 - [Template Method Design Pattern (Encapsulating Algorithms)](#template-method-design-pattern-encapsulating-algorithms)
-  - [Definations](#definations)
+  - [Definitions](#definitions)
   - [The Problem](#the-problem)
-  - [Code Analysis](#code-analysis)
-    - [The Template Method](#the-template-method)
-    - [Step1 & Step4](#step1--step4)
-    - [Step2 & Step3](#step2--step3)
+      - [CaffeineBevrage Class](#caffeinebevrage-class)
       - [Tea Class](#tea-class)
       - [Coffee Class](#coffee-class)
-  - [Testing the design pattern](#testing-the-design-pattern)
+    - [let's analyze the code](#lets-analyze-the-code)
+    - [Template Method Pattern](#template-method-pattern)
+  - [Let's make some coffee & tea](#lets-make-some-coffee--tea)
     - [Output](#output)
   - [Hook Method](#hook-method)
   - [Advantages](#advantages)
   - [When to use](#when-to-use)
   - [Credits](#credits)
 
-## Definations
+## Definitions
 
 **The Official Definition:**
 The Template Method Pattern defines the skeleton
@@ -25,11 +24,11 @@ subclasses. Template Method lets subclasses redefine
 certain steps of an algorithm without changing the
 algorithm’s structure.
 ***
-**What's Template Method ?** it’s a method that defines an algorithm as a set of steps. One or more of these steps is defined to be abstract and implemented by a subclass. This ensures the algorithm’s structure stays unchanged, while subclasses provide some part of the implementation.
+**What's Template Method?** it’s a method that defines an algorithm as a set of steps. One or more of these steps is defined to be abstract and implemented by a subclass. This ensures the algorithm’s structure stays unchanged, while subclasses provide some part of the implementation.
 
 ## The Problem
 
-To make the problem easier to grasp let's say we need to create a program for cafe this program will have the ability to prepare coffee and tea.
+To make the pattern easier to grasp let's say we need to create a program for cafes this program will have the ability to prepare coffee and tea using the following recipes.
 
 | Coffee Recipe | Tea Recipe |
 |---|---|
@@ -67,7 +66,7 @@ class Coffee {
 }
 ```
 
-Each step is implemented as a seprate method and all of these steps gets called inside `prepareRecipe()` method.
+Each step is implemented as a separate method and all of these steps get called inside `prepareRecipe()` method.
 
 The `Tea` class:
 
@@ -97,7 +96,7 @@ class Tea {
 }
 ```
 
-If we compared both classes we will find out that both `boilWater()` and `pourInCup()` steps are identical in both classes so there's code duplication !
+If we compared both classes we will find out that both `boilWater()` and `pourInCup()` steps are identical in both classes so there's code duplication!
 
 | Coffee  | = / ≠ |  Tea |
 |---|---|---|
@@ -106,42 +105,45 @@ If we compared both classes we will find out that both `boilWater()` and `pourIn
 | `pourInCup()` | =  | `pourInCup()`  |
 | `addSugarAndMilk()` | ≠  | `addLemon()`  |
 
-To eleminate this duplication we colud abstract the commonality into a base class.
-let's create class called `CaffineBeverage` that wraps the duplicated code.
+To eliminate this duplication we could abstract the commonality into a base class.
+let's create a class called `CaffineBeverage` that wraps the duplicated code.
 
-Also if we had a closer look we will find that both algorithms are different in two steps that are special for the kind of the caffine beverage we are making, so we colud abstract these two steps so instead of `brewCoffeeGrinds()` and  `steepTeaBag()` steps we colud make abstract step called `brew()`. and for the condiments we colud abstract it to `addCondiments()`
+Also if we had a closer look we will find that both algorithms are different in two steps that are special for the kind of the caffeine beverage we are making, so we could abstract these two steps so instead of `brewCoffeeGrinds()` and  `steepTeaBag()` steps we could make abstract step called `brew()`. and for the condiments we could abstract it to `addCondiments()`
 
 the new design will look like this:
+![alt text](../../assets/template_method/Classdiagram1.png "Class Diagram")
+`CaffeineBevrage` will be implemented as an abstract class
 
-## Code Analysis
-
-### The Template Method
-
-`prepareRecipe()`
-is our template method. Why?
-
-Because It serves as a template for an algorithm—in this case, an algorithm for making caffeinated beverages.
-
-In the template, each step of the algorithm is represented by a method.
-
-The `prepareRecipe()` method controls the algorithm. No one can change this, and it counts on subclasses to provide some or all of the implementation.
+#### CaffeineBevrage Class
 
 ```dart
+import 'package:meta/meta.dart';
+
+abstract class CaffeineBevrage {
+  const CaffeineBevrage();
+
+  @nonVirtual
   void prepareRecipe() {
-    boilWater();       /*<= Step 1*/
-    brew();            /*<= Step 2*/
-    addCondiments();   /*<= Step 3*/
-    pourInCup();      /*<= Step 4*/
+    boilWater();
+    brew();
+    pourInCup();
+    addCondiments();
   }
+
+  void brew();
+  void addCondiments();
+
+  @nonVirtual
+  void boilWater() {
+    print('Boiling Water');
+  }
+
+  @nonVirtual
+  void pourInCup() {
+    print('Pouring into cup');
+  }
+}
 ```
-
-### Step1 & Step4
-
-`boilWater()` &  `pourInCup()`: are reusable steps in both the tea and the coffee recipes so it's implemented using the template method class `CaffeineBeverage`.
-
-### Step2 & Step3
-
-`brew()` &  `pourInCup()`: these methods are declared as abstract because there implementation differs in different recipies so it's get implemented by subclasses.
 
 #### Tea Class
 
@@ -175,7 +177,48 @@ class Coffee extends CaffeineBevrage {
 }
 ```
 
-## Testing the design pattern
+Now you can see that we have improved the design a lot, we have removed the duplications, Hurray!
+
+### let's analyze the code
+
+`prepareRecipe()`
+is called the template method. Why?
+
+Because It serves as a template for an algorithm, in this case, an algorithm for making caffeinated beverages.
+
+In the template, each step of the algorithm is represented by a method.
+
+The `prepareRecipe()` method controls the algorithm. No one can change this, and it counts on subclasses to provide some or all of the implementation.
+
+**Then how we could protect this method so that subclasses wouldn't be able to override it?**
+
+Well unfortunately unlike programming languages like java where you could use `final` method declaration to prevent subclasses from overriding methods, dart doesn't provide a keyword for preventing that instead `package:meta` provides a `@nonVirtual` annotation to disallow overriding methods.
+
+> Note that this annotations provides hints to dartanalyzer. They won't prevent violiating the annotations instead will cause warnings to be printed.
+
+`boilWater()` & `pourInCup()`: are called *concrete operations* as they are reusable steps in both the tea and coffee recipes so it's implemented by the abstract class `CaffeineBeverage` and protected using the `@nonVirtual` annotation.
+
+**But why is `brew()` & `addCondiments()` are abstract?**
+
+These methods are called *primitive operations* because Coffee and Tea handle these
+methods in different ways, they’re declared as abstract, to let the
+subclasses worry about implementing these methods!
+
+### Template Method Pattern
+
+This pattern is all about creating a template for an algorithm. What’s a template? As you’ve seen it’s just a method; more specifically, it’s a method that defines an algorithm as a set of steps. One or more of these steps is defined to be abstract and implemented by a subclass. This ensures the algorithm’s structure stays unchanged,
+while subclasses provide some part of the implementation.
+
+The class diagram below shows the general structure of the design pattern.
+![alt text](../../assets/template_method/Classdiagram2.png "Class Diagram")
+
+- The *AbstractClass*: contains the template method and abstract versions of the operations used in the template method.
+
+- The *templateMethod* makes use of the primitive & concrete operations to implement an algorithm. It is decoupled from the actual implementation of these operations.
+  
+- The *ConcreteClass* implements the abstract operations, which are called when the `templateMethod()` needs them, There may be many ConcreteClasses, each implementing the full set of operations required by the template method.
+
+## Let's make some coffee & tea
 
 ```dart
 void main(List<String> args) {
@@ -189,29 +232,29 @@ void main(List<String> args) {
 }
 ```
 
-`prepareRecipe()` => calls the algorithm methods which some is implemented by our `Tea` & `Coffee` classes and others are implemented already by the `CaffeineBeverage` abstract class.
+`prepareRecipe()` => calls the algorithm methods which some are implemented by our `Tea` & `Coffee` classes and others are implemented already by the abstract class.
 
 ### Output
 
 ```text
 Boiling Water
 Steeping the tea
-Adding Lemon
 Pouring into cup
+Adding Lemon
 ============
 Boiling Water
 Dripping Coffee through filter
-Adding Sugar And Milk
 Pouring into cup
+Adding Sugar And Milk
 ```
 
 ## Hook Method
 
-***Hook*** is a method that is declared in the abstract class, but only given an empty or default implementation. This gives subclasses the ability to “hook into” the algorithm at various points, if they wish; a subclass is also free to ignore the hook.
+***Hook*** is a method that is declared in the abstract class but only given an empty or default implementation. This gives subclasses the ability to “hook into” the algorithm at various points if they wish; a subclass is also free to ignore the hook.
 ***
-We colud use hook method to enhance our algorithm by making subclasses have the decision whether to invoke `addCondiments()` method or not.
+We could use the hook method to enhance our algorithm by making subclasses have the decision whether to invoke `addCondiments()` method or not.
 
-To do this first we will modify `CaffeineBevrage` abstract class by adding concrete method `wantsCondiments()` that decide whether to add condiments or not by default.
+To do this first we will modify `CaffeineBevrage` abstract class by adding a concrete method that decides whether to add condiments or not by default.
 
 Let's say we will make it by default always adding condiments.
 
@@ -224,24 +267,25 @@ abstract class CaffeineBevrageWithHook {
 }
 ```
 
-Next we will modify our template method `prepareRecipe()` by adding condition that decides whether to add condiments or not.
+Next, we will modify our template method `prepareRecipe()` by adding a condition that decides whether to add condiments or not.
 
 ```dart
 abstract class CaffeineBevrageWithHook {
   void prepareRecipe() {
     boilWater();
     brew();
+    pourInCup();
+    
     if (wantsCondiments()) {
       addCondiments();
     }
-    pourInCup();
   }
 
                               ...
 }
 ```
 
-Now if we tested the code we will find the same output as previous, but if we want user to decide we may override the `wantsCondiments()` method in one of our subclasses `Coffee` / `Tea` and provide different implementation
+Now if we tested the code we will find the same output as previous, but if we want the user to decide we may override the `wantsCondiments()` method in one of our subclasses `Coffee` / `Tea` and provide a different implementation
 
 ```dart
 class CoffeeWithHook extends CaffeineBevrageWithHook {
@@ -259,13 +303,13 @@ class CoffeeWithHook extends CaffeineBevrageWithHook {
 }
 ```
 
-Now lets test the code
+Now let's test the code
 
 ```sh
 Boiling Water
 Dripping Coffee through filter
-Do you want to add Condiments? No
 Pouring into cup
+Do you want to add Condiments? No
 ```
 
 ## Advantages
