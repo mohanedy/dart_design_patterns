@@ -1,5 +1,7 @@
 # Template Method Design Pattern (Encapsulating Algorithms)
 
+![alt text](../../assets/template_method/medium_cover.png "Cover")
+
 - [Template Method Design Pattern (Encapsulating Algorithms)](#template-method-design-pattern-encapsulating-algorithms)
   - [Definitions](#definitions)
   - [The Problem](#the-problem)

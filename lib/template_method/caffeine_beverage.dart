@@ -11,13 +11,16 @@ abstract class CaffeineBevrage {
     addCondiments();
   }
 
-  void brew();
-  void addCondiments();
+  @nonVirtual
   void boilWater() {
     print('Boiling Water');
   }
 
+  @nonVirtual
   void pourInCup() {
     print('Pouring into cup');
   }
+
+  void brew();
+  void addCondiments();
 }
